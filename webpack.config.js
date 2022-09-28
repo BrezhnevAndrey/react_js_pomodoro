@@ -2,12 +2,17 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 
+const NODE_ENV = process.env.NODE_ENV;
+
 module.exports = {
-  mode: "development",
+  resolve: {
+    extensions: [".js", ".jsx", ".ts", ".tsx", ".json"],
+  },
+  mode: NODE_ENV ? NODE_ENV : "development",
   entry: ["@babel/polyfill", "./src/index.jsx"],
   output: {
     path: path.resolve(__dirname, "dist"),
-    filename: "[name].[hash].js",
+    filename: "index.js",
   },
   devServer: {
     port: 3000,
@@ -29,8 +34,24 @@ module.exports = {
         },
       },
       {
+        test: /\.[tj]sx?$/,
+        use: ["ts-loader"],
+      },
+      {
         test: /\.(css|less)$/,
-        use: ["style-loader", "css-loader", "less-loader"],
+        use: [
+          "style-loader",
+          {
+            loader: "css-loader",
+            options: {
+              modules: {
+                mode: "local",
+                localIdentName: "[name]__[local]--[hash:base64:5]",
+              },
+            },
+          },
+          "less-loader",
+        ],
       },
       {
         test: /\.(jpeg|png|svg|jpg)$/,
@@ -38,4 +59,8 @@ module.exports = {
       },
     ],
   },
+  optimization: {
+    minimize: true,
+  },
+  devtool: "eval",
 };
