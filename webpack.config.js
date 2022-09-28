@@ -3,6 +3,8 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 
 const NODE_ENV = process.env.NODE_ENV;
+const IS_PROD = NODE_ENV === "production" ? true : false;
+const IS_DEV = NODE_ENV === "development" ? true : false;
 
 module.exports = {
   resolve: {
@@ -62,5 +64,5 @@ module.exports = {
   optimization: {
     minimize: true,
   },
-  devtool: "eval",
+  devtool: IS_PROD ? false : "eval",
 };
