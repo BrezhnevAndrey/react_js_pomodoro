@@ -53,6 +53,12 @@ module.exports = {
             },
           },
           "less-loader",
+          {
+            loader: "sass-resources-loader",
+            options: {
+              resources: path.resolve("./src/style", "variables.less"),
+            },
+          },
         ],
       },
       {
