@@ -1,0 +1,26 @@
+.container {
+  max-width: 77px;
+  height: 100px;
+}
+
+.pillar {
+  background-color: @redLow;
+  transition: background-color 0.3s ease-in-out;
+  &:hover {
+    background-color: @red;
+  }
+}
+
+.pillar_active {
+  background-color: @redHigh;
+  + .text {
+    color: @redHigh;
+  }
+}
+
+.text {
+  color: @greyDark;
+  font-size: 24px;
+  line-height: 1.2;
+  text-align: center;
+}

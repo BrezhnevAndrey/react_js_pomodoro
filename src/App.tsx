@@ -1,12 +1,11 @@
 import React from "react";
-import { Button } from "./components/Button/Button";
+import { UIKit } from "./components/UIKit/UIKit";
 
 export function App() {
   return (
     <div>
       <h2>Привет</h2>
-      <Button text="Кнопка" />
-      <Button text="тоже кнопка" />
+      <UIKit />
     </div>
   );
 }

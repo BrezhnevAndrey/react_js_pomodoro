@@ -1,0 +1,17 @@
+.button {
+  background-color: transparent;
+  border-radius: 100%;
+  padding: 0;
+  border: unset;
+  display: flex;
+  circle {
+    fill: @grey;
+    transition: fill 0.3s ease-in-out;
+  }
+  &:hover {
+    cursor: pointer;
+    circle {
+      fill: @greenDark;
+    }
+  }
+}

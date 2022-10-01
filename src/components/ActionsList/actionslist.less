@@ -1,0 +1,22 @@
+.list {
+  position: relative;
+  border: 1px solid @grey;
+  padding: 10px 0px 0px 0px;
+  width: 165px;
+  background-color: @white;
+  &::after {
+    content: "";
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-top: 1px solid @grey;
+    border-right: 1px solid @grey;
+    background-color: @white;
+    transform: rotate(-45deg);
+    top: -6px;
+    left: 49%;
+  }
+  li {
+    list-style-type: none;
+  }
+}

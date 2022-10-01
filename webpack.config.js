@@ -62,8 +62,15 @@ module.exports = {
         ],
       },
       {
-        test: /\.(jpeg|png|svg|jpg)$/,
-        use: ["file-loader"],
+        test: /\.(jpeg|png|jpg)$/,
+        use: {
+          loader: "file-loader",
+        },
+      },
+      {
+        test: /\.svg$/i,
+        issuer: /\.[jt]sx?$/,
+        use: ["@svgr/webpack"],
       },
     ],
   },
