@@ -5,16 +5,24 @@ import styles from "./actionButton.less";
 interface IActionButton {
   text: string;
   imageIcon?: React.ReactElement;
+  IsActive?: boolean;
   click: () => void;
 }
 
-export function ActionButton({ text, imageIcon, click }: IActionButton) {
+export function ActionButton({
+  text,
+  imageIcon,
+  click,
+  IsActive = true,
+}: IActionButton) {
   return (
     <FrameButton
       text={text}
       click={click}
       imageIcon={imageIcon}
-      anyClass={styles.button}
+      anyClass={
+        IsActive ? styles.button : styles.button_disabled + " " + styles.button
+      }
     />
   );
 }

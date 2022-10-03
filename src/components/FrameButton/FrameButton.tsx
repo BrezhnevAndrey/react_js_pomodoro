@@ -5,7 +5,7 @@ interface IFrameButton {
   text?: string;
   imageIcon?: React.ReactElement;
   anyClass?: string;
-  click: () => void;
+  click: () => any;
 }
 
 export function FrameButton({ text, imageIcon, anyClass, click }: IFrameButton) {

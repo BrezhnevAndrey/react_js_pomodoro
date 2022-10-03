@@ -21,6 +21,7 @@ export function ActionsList() {
           text="Уменьшить"
           imageIcon={<MinusImg />}
           click={() => {}}
+          IsActive={false}
         />
       </li>
       <li>

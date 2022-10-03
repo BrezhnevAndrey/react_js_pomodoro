@@ -8,11 +8,16 @@
   transition: background-color 0.3s ease-in-out;
   display: flex;
   flex-direction: row;
-  >:first-child {
+  > :first-child {
     margin-right: 10px;
   }
   &:hover {
     cursor: pointer;
     background-color: @greyLight;
+  }
+  &_disabled {
+    path {
+      fill: @grey;
+    }
   }
 }

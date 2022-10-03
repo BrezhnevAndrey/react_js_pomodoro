@@ -1,0 +1,21 @@
+.logo {
+  display: flex;
+  align-items: center;
+  color: @redHigh;
+  font-size: 24px;
+  line-height: 1;
+  path:first-child {
+    transition: fill 0.3s ease-in-out;
+    fill: @redHigh;
+  }
+  transition: color 0.3s ease-in-out;
+  > :first-child {
+    margin-right: 12px;
+  }
+  &:hover {
+    color: @redDark;
+    path:first-child {
+      fill: @redDark;
+    }
+  }
+}
