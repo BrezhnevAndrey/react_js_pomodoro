@@ -1,5 +1,5 @@
 import React from "react";
-import { Timer } from "../Timer/Timer";
+import { Timer } from "./Timer/Timer";
 import styles from "./timercontainer.less";
 
 export function TimerContainer() {

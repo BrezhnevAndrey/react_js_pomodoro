@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "./taskbutton.less";
-import ImageIcon from "../../../images/svg/points.svg";
-import { FrameButton } from "../../FrameButton";
+import ImageIcon from "../../../../images/svg/points.svg";
+import { FrameButton } from "../../../FrameButton";
 
 interface ITaskButton {
   click: () => void;

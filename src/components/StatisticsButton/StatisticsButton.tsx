@@ -1,13 +1,13 @@
 import React from "react";
-import styles from "./headerbutton.less";
+import styles from "./statisticsbutton.less";
 import ImageIcon from "../../images/svg/graph.svg";
 import { FrameButton } from "../FrameButton/FrameButton";
 
-interface IHeaderButton {
+interface IStatisticsButton {
   text: string;
 }
 
-export function HeaderButton({ text }: IHeaderButton) {
+export function StatisticsButton({ text }: IStatisticsButton) {
   return (
     <FrameButton
       text={text}

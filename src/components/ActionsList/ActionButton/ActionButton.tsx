@@ -4,7 +4,7 @@ import styles from "./actionButton.less";
 
 interface IActionButton {
   text: string;
-  imageIcon?: React.ReactElement;
+  imageIcon?: JSX.Element;
   IsActive?: boolean;
   click: () => void;
 }

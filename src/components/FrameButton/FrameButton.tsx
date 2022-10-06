@@ -2,10 +2,10 @@ import React from "react";
 import styles from "./framebutton.less";
 
 interface IFrameButton {
-  text?: string;
-  imageIcon?: React.ReactElement;
-  anyClass?: string;
   click: () => any;
+  text?: string;
+  imageIcon?: JSX.Element;
+  anyClass?: string;
 }
 
 export function FrameButton({ text, imageIcon, anyClass, click }: IFrameButton) {
