@@ -1,4 +1,5 @@
-import "./style.less";
+import "./style.css";
+import "./styles.m.css";
 import * as React from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./App";

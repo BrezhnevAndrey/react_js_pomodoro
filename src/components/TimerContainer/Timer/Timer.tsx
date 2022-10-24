@@ -1,20 +1,39 @@
 import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  changeActiveTaskTimeLeft,
+  increasePauseCounter,
+  increasePauseTime,
+  resetActiveTaskTimeLeft,
+  TInitialState,
+  TTaskState,
+} from "../../../store/slice";
 import { Button } from "../../Button/Button";
 import { OpenButton } from "../../OpenButton/OpenButton";
 import styles from "./timer.less";
 
 export function Timer() {
-  const [seconds, setSeconds] = useState(0);
-  const [minutes, setMinutes] = useState(25);
-  const [IsTurnUp, setIsTurnUp] = useState(false);
+  const dispatch = useDispatch();
+
+  const activeTask = useSelector<TInitialState, TTaskState>((state) =>
+    state.tasks.tasks[1] ? state.tasks.tasks[1] : state.tasks.tasks[0]
+  );
+  const seconds = activeTask.timeLeft % 60;
+  const minutes = Math.trunc(activeTask.timeLeft / 60);
+  const [IsPaused, setIsPaused] = useState(true);
+  const [IsStarted, setIsStarted] = useState(false);
 
   const tick = () => {
-    console.log(seconds, minutes);
-    if (minutes === 0 && seconds === 0) setIsTurnUp(false);
-    else if (seconds === 0) {
-      setMinutes(minutes - 1);
-      setSeconds(59);
-    } else setSeconds(seconds - 1);
+    if (activeTask.timeLeft === 0) {
+      setIsPaused(true);
+      return;
+    }
+    dispatch(changeActiveTaskTimeLeft(-1));
+  };
+
+  const pauseTick = () => {
+    if (activeTask.timeLeft === 0) return;
+    dispatch(increasePauseTime(1));
   };
 
   const timeFormat = (value: number): string => {
@@ -23,13 +42,21 @@ export function Timer() {
   };
 
   useEffect(() => {
-    if (IsTurnUp) {
+    if (!IsPaused && IsStarted) {
       const timerId = setInterval(() => tick(), 1000);
-      setSeconds(seconds);
-      setMinutes(minutes);
       return () => clearInterval(timerId);
     }
-  }, [seconds, minutes, IsTurnUp]);
+    if (IsPaused && IsStarted) {
+      const timerId = setInterval(() => pauseTick(), 1000);
+      return () => clearInterval(timerId);
+    }
+  }, [seconds, minutes, IsPaused, IsStarted]);
+
+  useEffect(() => {
+    console.log("sdsad");
+    setIsStarted(false);
+    setIsPaused(true);
+  }, [activeTask.taskName]);
 
   return (
     <div className={styles.container}>
@@ -44,21 +71,57 @@ export function Timer() {
         <span className={styles.taskString}>Сверстать сайт</span>
       </div>
       <div className={styles.btnContainer}>
-        {!IsTurnUp && (
+        {!IsStarted && (
           <Button
             text={"Старт"}
             style={"green"}
-            click={() => setIsTurnUp(true)}
+            click={() => {
+              setIsPaused(false);
+              setIsStarted(true);
+            }}
           />
         )}
-        {IsTurnUp && (
+        {IsStarted && IsPaused && (
+          <Button
+            text={"Продолжить"}
+            style={"green"}
+            click={() => {
+              setIsPaused(false);
+            }}
+          />
+        )}
+        {!IsPaused && (
           <Button
             text={"Пауза"}
             style={"green"}
-            click={() => setIsTurnUp(false)}
+            click={() => {
+              setIsPaused(true);
+              dispatch(increasePauseCounter());
+            }}
           />
         )}
-        <Button text={"Стоп"} style={"red"} click={() => setIsTurnUp(false)} />
+        {(!IsStarted || !IsPaused) && (
+          <Button
+            text={"Стоп"}
+            style={"red"}
+            click={() => {
+              setIsPaused(true);
+              setIsStarted(false);
+              dispatch(resetActiveTaskTimeLeft());
+            }}
+          />
+        )}
+        {IsStarted && IsPaused && (
+          <Button
+            text={"Сделано"}
+            style={"red"}
+            click={() => {
+              setIsPaused(true);
+              setIsStarted(false);
+              dispatch(resetActiveTaskTimeLeft());
+            }}
+          />
+        )}
       </div>
     </div>
   );

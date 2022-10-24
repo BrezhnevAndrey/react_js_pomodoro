@@ -15,7 +15,7 @@
   }
 }
 
-.number {
+.amount {
   display: inline-block;
   border: 1px solid @grey;
   border-radius: 50%;
@@ -25,6 +25,17 @@
 .taskName {
   display: inline-block;
   word-break: break-all;
+  resize: none;
+  overflow: hidden;
+  border: none;
+  width: 100%;
+  background-color: transparent;
+  &[contenteditable="true"] {
+    background-color: @greyLight;
+  }
+  &:focus {
+    outline: none;
+  }
 }
 
 .actionContainer {

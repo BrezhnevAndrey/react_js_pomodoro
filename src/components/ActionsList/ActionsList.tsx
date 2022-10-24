@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import styles from "./actionslist.less";
 import { ActionButton } from "./ActionButton/ActionButton";
 import { ListItem } from "../ListItem/ListItem";
@@ -15,8 +15,10 @@ interface IActionsList {
 }
 
 export function ActionsList({ buttons }: IActionsList) {
+  const listRef = useRef<HTMLUListElement>(null);
+
   return (
-    <ul className={styles.list}>
+    <ul className={styles.list} ref={listRef}>
       {buttons.map((el, index) => (
         <ListItem key={index.toString()}>
           <ActionButton

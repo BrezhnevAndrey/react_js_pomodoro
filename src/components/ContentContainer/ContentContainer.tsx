@@ -1,23 +1,24 @@
-import React, { useState } from "react";
-import { TaskContainer, tasks } from "../TaskContainer";
-import { TextList, items } from "../TextList";
+import React from "react";
+import { TaskContainer } from "../TaskContainer";
+import { TextList } from "../TextList";
 import styles from "./contentcontainer.less";
-import { store } from "../../store/store";
 import { TaskForm } from "../TaskForm/TaskForm";
 
+const items = [
+  "Выберите категорию и напишите название текущей задачи",
+  "Запустите таймер («помидор»)",
+  "Работайте пока «помидор» не прозвонит",
+  "Сделайте короткий перерыв (3-5 минут)",
+  "Продолжайте работать «помидор» за «помидором», пока задача не будут выполнена",
+  "Каждые 4 «помидора» делайте длинный перерыв (15-30 минут)",
+];
+
 export function ContentContainer() {
-  const [tasksList, setTasksList] = useState(tasks);
-  function handleClick() {
-    const taskName = store.getState().value;
-    if (!taskName) return;
-    setTasksList(tasksList.concat(taskName));
-    tasks.push(taskName);
-  }
   return (
     <div className={styles.container}>
       <TextList title="Ура! Теперь можно начать работать:" items={items} />
-      <TaskForm click={handleClick} />
-      <TaskContainer time={"25 мин"} tasks={tasksList} func={setTasksList}/>
+      <TaskForm />
+      <TaskContainer />
     </div>
   );
 }

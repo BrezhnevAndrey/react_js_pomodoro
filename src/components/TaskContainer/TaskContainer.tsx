@@ -1,38 +1,58 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { pushTasksReducer, TInitialState, TTaskState } from "../../store/slice";
+import { randomString } from "../../utilits/randomString";
 import { ListItem } from "../ListItem/ListItem";
 import { Task } from "./Task/Task";
 import styles from "./taskcontainer.less";
 
-export const tasks: Array<string> = ["кошка", "сабака"];
+export const tasks: Array<TTaskState> = [
+  {
+    taskName: "Помыть кошку",
+    amount: 2,
+    timeLeft: 1500,
+  },
+  {
+    taskName: "Побрить кошку",
+    amount: 1,
+    timeLeft: 1500,
+  },
+  {
+    taskName: "Покормить кошку",
+    amount: 1,
+    timeLeft: 1500,
+  },
+];
 
-interface ITaskContainer {
-  time: string;
-  tasks: Array<string>;
-  func: React.Dispatch<React.SetStateAction<string[]>>;
-}
+export function TaskContainer() {
+  const dispatch = useDispatch();
+  const tasksState = useSelector<TInitialState, Array<TTaskState>>(
+    (state) => state.tasks.tasks
+  );
 
-export function TaskContainer({ time, tasks, func }: ITaskContainer) {
-  
+  const takssMemo = useMemo<JSX.Element>(() => {
+    return (
+      <ul className={styles.taskcontainer}>
+        {tasksState.map(
+          (el, index) =>
+            index > 0 && (
+              <ListItem key={randomString()}>
+                <Task index={index} taskName={el.taskName} />
+              </ListItem>
+            )
+        )}
+      </ul>
+    );
+  }, [tasksState.length]);
 
-
-  const deleteTask: (...args: any) => void = (
-    number: number,
-    tasks: Array<string>
-  ) => {
-    func(tasks.filter((item, index) => index !== number - 1));
-    tasks.splice(number - 1, 1);
-  };
+  useEffect(() => {
+    dispatch(pushTasksReducer(tasks));
+  }, []);
 
   return (
     <div className={styles.container}>
-      <ul className={styles.taskcontainer}>
-        {tasks.map((el, index) => (
-          <ListItem key={index.toString()}>
-            <Task number={index + 1} taskName={el} deleteFunc={deleteTask} />
-          </ListItem>
-        ))}
-      </ul>
-      <div className={styles.time}>{time}</div>
+      {takssMemo}
+      <div className={styles.time}>25 мин</div>
     </div>
   );
 }

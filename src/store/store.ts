@@ -1,19 +1,8 @@
-import { createSlice, configureStore } from "@reduxjs/toolkit";
-
-const counterSlice = createSlice({
-  name: "task",
-  initialState: {
-    value: "",
-  },
-  reducers: {
-    taskReducer: (state, action) => {
-      state.value = action.payload;
-    },
-  },
-});
-
-export const { taskReducer } = counterSlice.actions;
+import { configureStore } from "@reduxjs/toolkit";
+import { taskReducers } from "./slice";
 
 export const store = configureStore({
-  reducer: counterSlice.reducer,
+  reducer: {
+    tasks: taskReducers,
+  },
 });
