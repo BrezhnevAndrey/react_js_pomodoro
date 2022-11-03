@@ -11,7 +11,10 @@ import { Modal } from "../../Modal/Modal";
 import { CSSTransition } from "react-transition-group";
 import ContentEditable from "react-contenteditable";
 import { useDispatch, useSelector } from "react-redux";
+import { changeIsPaused, changeIsStarted } from "../../../store/timerSlice";
 import {
+  // changeIsPaused,
+  // changeIsStarted,
   changeTasksReducer,
   deleteTasksReducer,
   TInitialState,
@@ -89,14 +92,14 @@ export function Task({ index, taskName }: ITask) {
       text: "Увеличить",
       imageIcon: <PlusImg />,
       click: () => {
-        dispatch(changeTasksReducer([index, amount + 1]));
+        dispatch(changeTasksReducer([index, 1]));
       },
     },
     {
       text: "Уменьшить",
       imageIcon: <MinusImg />,
       click: () => {
-        if (amount > 1) dispatch(changeTasksReducer([index, amount - 1]));
+        if (amount > 1) dispatch(changeTasksReducer([index, -1]));
       },
       IsActive: amount > 1 ? true : false,
     },
@@ -131,6 +134,8 @@ export function Task({ index, taskName }: ITask) {
             click={() => {
               setIsOpenModal(false);
               deleteTask(index, tasks);
+              dispatch(changeIsStarted(false));
+              dispatch(changeIsPaused(false));
             }}
             cancelClick={() => setIsOpenModal(false)}
           />

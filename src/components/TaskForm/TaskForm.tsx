@@ -24,9 +24,10 @@ export function TaskForm() {
     const task = {
       taskName: refInput.current.value,
       amount: 1,
-      timeLeft: 1500,
+      timeLeft: 6,
       pauseTime: 0,
       pauseCounter: 0,
+      pomadoroCounter: 1,
     };
     dispatch(pushTasksReducer([task]));
     tasks.push(task);

@@ -6,11 +6,12 @@ interface IFrameButton {
   text?: string;
   imageIcon?: JSX.Element;
   anyClass?: string;
+  disabled?: boolean;
 }
 
-export function FrameButton({ text, imageIcon, anyClass, click }: IFrameButton) {
+export function FrameButton({ click, text, imageIcon, anyClass, disabled }: IFrameButton) {
   return (
-    <button className={anyClass} onClick={click}>
+    <button disabled={disabled} className={anyClass} onClick={click}>
       {imageIcon}
       {text}
     </button>
