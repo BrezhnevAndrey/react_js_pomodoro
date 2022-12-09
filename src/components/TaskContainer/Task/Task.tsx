@@ -13,8 +13,6 @@ import ContentEditable from "react-contenteditable";
 import { useDispatch, useSelector } from "react-redux";
 import { changeIsPaused, changeIsStarted } from "../../../store/timerSlice";
 import {
-  // changeIsPaused,
-  // changeIsStarted,
   changeTasksReducer,
   deleteTasksReducer,
   TInitialState,
@@ -78,10 +76,6 @@ export function Task({ index, taskName }: ITask) {
     }
     return () => document.removeEventListener("click", handleClick);
   }, [IsOpenActions]);
-
-  useEffect(() => {
-    tasks[index - 1].amount = amount;
-  }, [amount]);
 
   useEffect(() => {
     contentRef.current?.focus();

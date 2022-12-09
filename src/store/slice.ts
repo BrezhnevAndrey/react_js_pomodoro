@@ -5,6 +5,7 @@ export type TInitialState = {
     inputValue: string;
     defaultTime: number;
     tasks: Array<TTaskState>;
+    statisticsWeekAgo: 0 | 1 | 2;
   };
 };
 
@@ -20,6 +21,7 @@ const counterSlice = createSlice({
   initialState: {
     inputValue: "",
     defaultTime: 1500,
+    statisticsWeekAgo: 0,
     tasks: [
       {
         taskName: "Нет задач",
@@ -64,6 +66,9 @@ const counterSlice = createSlice({
     increasePomadoroCounter(state) {
       state.tasks[1] && (state.tasks[1].pomadoroCounter += 1);
     },
+    changeStatisticsWeekAgo(state, action: PayloadAction<0 | 1 | 2>) {
+      state.statisticsWeekAgo = action.payload;
+    },
   },
 });
 
@@ -75,6 +80,7 @@ export const {
   changeTasksReducer,
   changeActiveTaskTimeLeft,
   increasePomadoroCounter,
+  changeStatisticsWeekAgo,
 } = counterSlice.actions;
 
 export const taskReducers = counterSlice.reducer;

@@ -1,15 +1,40 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "normalize.css";
 import { Header } from "./components/Header/Header";
 import { Main } from "./components/Main/Main";
-import { UIKit } from "./components/UIKit/UIKit";
-import { Login } from "./components/Login/Login";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { StatisticsContainer } from "./components/StatisticsContainer/StatisticsContainer";
+import { pushTasksReducer } from "./store/slice";
+import { tasks } from "./components/TaskContainer/TaskContainer";
+import { useDispatch } from "react-redux";
 
 export function App() {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(pushTasksReducer(tasks));
+  }, []);
+
   return (
-    <div>
+    <BrowserRouter>
       <Header />
-      <Main />
-    </div>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <div>
+              <Main />
+            </div>
+          }
+        />
+        <Route
+          path="/statistics"
+          element={
+            <div>
+              <StatisticsContainer />
+            </div>
+          }
+        />
+      </Routes>
+    </BrowserRouter>
   );
 }

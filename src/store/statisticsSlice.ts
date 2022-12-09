@@ -1,13 +1,53 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { dateFormat } from "../utilits/dateFormat";
+import { DayNumbers, MonthNumbers, WeekdayNumbers, WeekNumbers } from "luxon";
+import { today } from "../utilits/today";
+import { test } from "../utilits/today";
+
+const data = test || [
+  {
+    date: {
+      dayName: today.weekdayLong,
+      day: today.day,
+      month: today.month,
+      year: today.year,
+      weekNumber: today.weekNumber,
+      weekday: today.weekday,
+      locale: today.toLocaleString(),
+    },
+    value: {
+      timeToComplite: 0,
+      workingTime: 0,
+      pauseTime: 0,
+      pauseCounter: 0,
+      finishedPomadoro: 0,
+      activeTaskCounter: 1,
+      timeoutCounter: 1,
+    },
+  },
+];
 
 export type TStatisticsState = {
-  statistics: Array<TstatisticsElement>;
+  statistics: {
+    activeIndex: number;
+    dataset: Array<TstatisticsElement>;
+    activeTaskTime: number;
+  };
+};
+
+export type TDateState = {
+  dayName: string;
+  day: DayNumbers;
+  month: MonthNumbers;
+  year: number;
+  weekNumber: WeekNumbers;
+  weekday: WeekdayNumbers;
+  locale: string;
 };
 
 export type TstatisticsElement = {
-  date: string;
+  date: TDateState;
   value: {
+    timeToComplite: number;
     workingTime: number;
     pauseTime: number;
     pauseCounter: number;
@@ -19,19 +59,11 @@ export type TstatisticsElement = {
 
 const counterSlice = createSlice({
   name: "statistics",
-  initialState: [
-    {
-      date: dateFormat,
-      value: {
-        workingTime: 0,
-        pauseTime: 0,
-        pauseCounter: 0,
-        finishedPomadoro: 0,
-        activeTaskCounter: 1,
-        timeoutCounter: 1,
-      },
-    },
-  ],
+  initialState: {
+    activeIndex: today.weekday - 1,
+    activeTaskTime: 0,
+    dataset: data,
+  },
 
   reducers: {
     pushStatisticsReducer(
@@ -39,9 +71,10 @@ const counterSlice = createSlice({
       action: PayloadAction<Array<TstatisticsElement>>
     ) {
       action.payload.map((el) => {
-        state.push({
+        state.dataset.push({
           date: el.date,
           value: {
+            timeToComplite: el.value.timeToComplite,
             workingTime: el.value.workingTime,
             pauseTime: el.value.pauseTime,
             pauseCounter: el.value.pauseCounter,
@@ -53,25 +86,36 @@ const counterSlice = createSlice({
       });
     },
     increaseWorkingTime(state) {
-      state[state.length - 1].value.workingTime += 1;
+      state.dataset[state.dataset.length - 1].value.workingTime += 1;
     },
     increaseFinishedPomadoro(state) {
-      state[state.length - 1].value.finishedPomadoro += 1;
+      state.dataset[state.dataset.length - 1].value.finishedPomadoro += 1;
     },
     increasePauseTime(state) {
-      state[state.length - 1].value.pauseTime += 1;
+      state.dataset[state.dataset.length - 1].value.pauseTime += 1;
     },
     increasePauseCounter(state) {
-      state[state.length - 1].value.pauseCounter += 1;
+      state.dataset[state.dataset.length - 1].value.pauseCounter += 1;
     },
     increaseActiveTaskCounter(state) {
-      state[state.length - 1].value.activeTaskCounter += 1;
+      state.dataset[state.dataset.length - 1].value.activeTaskCounter += 1;
     },
     increaseTimeoutCounter(state) {
-      state[state.length - 1].value.timeoutCounter += 1;
+      state.dataset[state.dataset.length - 1].value.timeoutCounter += 1;
     },
-    createStatisticsDate(state, action: PayloadAction<string>) {
-      state[0].date = action.payload;
+    incraseActiveTaskTime(state) {
+      state.activeTaskTime += 1;
+    },
+    createStatisticsDate(state, action: PayloadAction<TDateState>) {
+      state.dataset[0].date = action.payload;
+    },
+    changeActiveIndex(state, action: PayloadAction<number>) {
+      state.activeIndex = action.payload;
+    },
+    changeTimeToComplete(state, action: PayloadAction<number>) {
+      state.dataset[state.dataset.length - 1].value.timeToComplite +=
+        action.payload;
+      state.activeTaskTime = 0;
     },
   },
 });
@@ -85,6 +129,9 @@ export const {
   increaseTimeoutCounter,
   createStatisticsDate,
   pushStatisticsReducer,
+  changeActiveIndex,
+  changeTimeToComplete,
+  incraseActiveTaskTime,
 } = counterSlice.actions;
 
 export const statisticsReducers = counterSlice.reducer;

@@ -1,0 +1,27 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: @borderRadius;
+}
+
+.imageInformation {
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
+  flex-basis: 70%;
+  > svg:not(:last-child) {
+    margin-right: 15px;
+  }
+}
+
+.textInformation {
+  padding: 9px;
+  text-align: center;
+  color: @white;
+  flex-grow: 1;
+  background-color: @redHigh;
+  width: 100%;
+  border-radius: 0 0 @borderRadius @borderRadius;
+}

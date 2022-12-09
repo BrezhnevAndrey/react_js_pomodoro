@@ -1,0 +1,24 @@
+.container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  & > :first-child {
+    margin-right: 32px;
+  }
+}
+
+.information {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  > div {
+    background-color: @greyLight;
+    &:first-child {
+      flex-basis: 55%;
+      margin-bottom: 32px;
+    }
+    &:last-child {
+      flex-basis: 45%;
+    }
+  }
+}

@@ -78,5 +78,5 @@ module.exports = {
   optimization: {
     minimize: true,
   },
-  devtool: IS_PROD ? false : "eval",
+  devtool: IS_PROD ? false : "eval-source-map",
 };

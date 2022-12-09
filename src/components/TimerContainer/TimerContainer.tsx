@@ -14,7 +14,7 @@ export function TimerContainer() {
 
   const timeoutCounter = useSelector<TStatisticsState, number>(
     (state) =>
-      state.statistics[state.statistics.length - 1].value.timeoutCounter
+      state.statistics.dataset[state.statistics.dataset.length - 1].value.timeoutCounter
   );
 
   const IsTimeout = useSelector<TTimerState, boolean>(

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  changeTimeToComplete,
+  incraseActiveTaskTime,
   increaseActiveTaskCounter,
   increaseFinishedPomadoro,
   increasePauseCounter,
@@ -16,9 +18,6 @@ import {
 } from "../../../store/timerSlice";
 import {
   changeActiveTaskTimeLeft,
-  // changeIsPaused,
-  // changeIsStarted,
-  // changeIsTimeout,
   changeTasksReducer,
   deleteTasksReducer,
   increasePomadoroCounter,
@@ -43,7 +42,8 @@ export function Timer() {
   );
   const activeTaskCounter = useSelector<TStatisticsState, number>(
     (state) =>
-      state.statistics[state.statistics.length - 1].value.activeTaskCounter
+      state.statistics.dataset[state.statistics.dataset.length - 1].value
+        .activeTaskCounter
   );
   const IsTimeout = useSelector<TTimerState, boolean>(
     (state) => state.timer.IsTimeout
@@ -53,6 +53,10 @@ export function Timer() {
   );
   const IsPaused = useSelector<TTimerState, boolean>(
     (state) => state.timer.IsPaused
+  );
+
+  const activeTaskTime = useSelector<TStatisticsState, number>(
+    (state) => state.statistics.activeTaskTime
   );
 
   const [timeoutTime, setTimeoutTime] = useState(0);
@@ -65,16 +69,20 @@ export function Timer() {
     if (!IsActiveTasks) return;
 
     if (activeTask.timeLeft === 0 && !IsTimeout) {
-      setTimeoutTime(timeoutTimeDefault);
-      dispatch(changeIsTimeout(true));
-      dispatch(increaseTimeoutCounter());
-      dispatch(increasePomadoroCounter());
       dispatch(changeTasksReducer([1, -1])) &&
         dispatch(increaseFinishedPomadoro());
+      dispatch(increasePomadoroCounter());
+      if (activeTask.amount > 0) {
+        setTimeoutTime(timeoutTimeDefault);
+        dispatch(changeIsTimeout(true));
+        dispatch(increaseTimeoutCounter());
+      }
+
       return;
     }
     dispatch(changeActiveTaskTimeLeft(-1));
     dispatch(increaseWorkingTime());
+    dispatch(incraseActiveTaskTime());
   };
 
   const timeoutTick = () => {
@@ -97,6 +105,9 @@ export function Timer() {
   };
 
   useEffect(() => {
+    // if(activeTask.amount === 0 && !IsTimeout) {
+    //   return ();
+    // }
     if (!IsActiveTasks) {
       dispatch(changeIsStarted(false));
       dispatch(changeIsTimeout(false));
@@ -143,7 +154,7 @@ export function Timer() {
         </span>
       </div>
       <div className={styles.btnContainer}>
-        {!IsTimeout && !IsStarted && (
+        {activeTask.amount > 0 && !IsTimeout && !IsStarted && (
           <Button
             text={"Старт"}
             style={"green"}
@@ -163,12 +174,13 @@ export function Timer() {
             }}
           />
         )}
-        {IsPaused && (
+        {(activeTask.amount === 0 || IsPaused) && (
           <Button
             text={"Продолжить"}
             style={"green"}
             click={() => {
-              dispatch(changeIsPaused(false));
+              (IsTimeout || activeTask.timeLeft !== 0) &&
+                dispatch(changeIsPaused(false));
             }}
           />
         )}
@@ -183,19 +195,20 @@ export function Timer() {
             }}
           />
         )}
-        {((!IsStarted && !IsTimeout) ||
-          (IsStarted && !IsPaused && !IsTimeout)) && (
-          <Button
-            text={"Стоп"}
-            style={"red"}
-            disabled={IsStarted ? false : true}
-            click={() => {
-              dispatch(changeIsStarted(false));
-              dispatch(resetActiveTaskTimeLeft());
-            }}
-          />
-        )}
-        {IsStarted && IsPaused && (
+        {activeTask.amount > 0 &&
+          ((!IsStarted && !IsTimeout) ||
+            (IsStarted && !IsPaused && !IsTimeout)) && (
+            <Button
+              text={"Стоп"}
+              style={"red"}
+              disabled={IsStarted ? false : true}
+              click={() => {
+                dispatch(changeIsStarted(false));
+                dispatch(resetActiveTaskTimeLeft());
+              }}
+            />
+          )}
+        {(activeTask.amount === 0 || (IsStarted && IsPaused)) && (
           <Button
             text={"Сделано"}
             style={"red"}
@@ -204,6 +217,7 @@ export function Timer() {
               dispatch(changeIsStarted(false));
               dispatch(deleteTasksReducer(1));
               dispatch(increaseActiveTaskCounter());
+              dispatch(changeTimeToComplete(activeTaskTime));
             }}
           />
         )}
