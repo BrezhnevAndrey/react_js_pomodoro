@@ -1,14 +1,43 @@
-import React, { FormEvent, useRef } from "react";
-import { useDispatch } from "react-redux";
-import { pushTasksReducer, inputValue } from "../../store/slice";
+import { openDB } from "idb";
+import React, { FormEvent, useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  pushTasksReducer,
+  inputValue,
+  TInitialState,
+  TTaskState,
+} from "../../store/slice";
+import { IUserOptions } from "../../store/userOptionsSlice";
 import { Button } from "../Button/Button";
 import { InputText } from "../InputText/InputText";
-import { tasks } from "../TaskContainer/TaskContainer";
 import styles from "./taskform.less";
 
 export function TaskForm() {
-  const refInput = useRef<HTMLInputElement>(null);
   const dispatch = useDispatch();
+  const refInput = useRef<HTMLInputElement>(null);
+  const [IsTasksLoading, setIsTasksLoading] = useState(false);
+  const taskArray = useSelector<TInitialState, Array<TTaskState>>(
+    (state) => state.tasks.tasks
+  );
+  const pomadoroDuration = useSelector<IUserOptions, number>(
+    (state) => state.userOptions.pomadoroDuration
+  );
+
+  useEffect(() => {
+    const changeDB = async () => {
+      const db = await openDB("pomadoro");
+      const tx = db.transaction("tasks", "readwrite");
+      const store = tx.objectStore("tasks");
+      const pice = taskArray.slice(1, taskArray.length);
+      const result = {
+        id: 1,
+        value: pice,
+      };
+      IsTasksLoading && (await store.put(result));
+    };
+    changeDB();
+    setIsTasksLoading(true);
+  }, [taskArray]);
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -24,13 +53,10 @@ export function TaskForm() {
     const task = {
       taskName: refInput.current.value,
       amount: 1,
-      timeLeft: 6,
-      pauseTime: 0,
-      pauseCounter: 0,
+      timeLeft: pomadoroDuration,
       pomadoroCounter: 1,
     };
     dispatch(pushTasksReducer([task]));
-    tasks.push(task);
     refInput.current.value = "";
     dispatch(inputValue(""));
   }

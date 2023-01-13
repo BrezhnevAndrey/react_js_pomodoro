@@ -8,8 +8,9 @@ import {
   Title,
   Tooltip,
   Legend,
+  Chart,
 } from "chart.js";
-import { Bar, getElementAtEvent } from "react-chartjs-2";
+import { Bar } from "react-chartjs-2";
 import { useDispatch, useSelector } from "react-redux";
 import {
   changeActiveIndex,
@@ -17,7 +18,7 @@ import {
   TStatisticsState,
 } from "../../store/statisticsSlice";
 import { TInitialState } from "../../store/slice";
-import { today } from "../../utilits/today";
+import { emptyDay, today } from "../../utilits/today";
 
 ChartJS.register(
   CategoryScale,
@@ -117,56 +118,56 @@ export function GraphicsPillar() {
 
   const labels = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
 
-  const chartData = statistics.filter((element, index) => {
-    console.log(statistics);
+  const days = [
+    "понедельник",
+    "вторник",
+    "среда",
+    "четверг",
+    "пятница",
+    "суббота",
+    "воскресенье",
+  ];
+
+  const chartData = statistics.filter((element) => {
     return element.date.weekNumber === today.weekNumber - statisticsWeekAgo;
   });
 
-  // while (chartData.length < 7) {
-  //   chartData.push({
-  //     date: {
-  //       dayName: today.weekdayLong,
-  //       day: today.day,
-  //       month: today.month,
-  //       year: today.year,
-  //       weekNumber: today.weekNumber,
-  //       weekday: today.weekday,
-  //       locale: today.toLocaleString(),
-  //     },
-  //     value: {
-  //       workingTime: 0,
-  //       pauseTime: 0,
-  //       pauseCounter: 0,
-  //       finishedPomadoro: 0,
-  //       activeTaskCounter: 1,
-  //       timeoutCounter: 1,
-  //     },
-  //   });
-  // }
+  const fullData: Array<TstatisticsElement> = days.map((day) => {
+    const h = chartData.some((el) => el.date.dayName === day);
+    if (!h) return emptyDay;
+    else {
+      const res = chartData.filter(
+        (el) => el.date.year + 1 >= today.year && el.date.dayName === day
+      );
+      return res[0];
+    }
+  });
 
   const data = {
     labels,
     datasets: [
       {
-        data: chartData.map((el) => el.value.workingTime / 3600),
+        data: fullData.map((el) => el.value.workingTime / 3600),
         backgroundColor: `#ea8979`,
       },
     ],
   };
 
-  console.log(data, options);
-
   const onClick = (event: any) => {
-    console.log(chartData, getElementAtEvent(chartRef.current, event)[0].index);
-    dispatch(
-      changeActiveIndex(
-        14 -
-          statisticsWeekAgo * 7 +
-          getElementAtEvent(chartRef.current, event)[0].index +
-          7 -
-          today.weekday
-      )
-    );
+    {
+      if (chartRef.current) {
+        const chart = Chart.getChart(chartRef.current);
+        const clickedElements = chart!.getElementsAtEventForMode(
+          event,
+          "x",
+          { axis: "x", intersect: false },
+          true
+        );
+        if (!clickedElements[0]) return;
+        const element = fullData[clickedElements[0].index];
+        dispatch(changeActiveIndex(element));
+      }
+    }
   };
 
   return (

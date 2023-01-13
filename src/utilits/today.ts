@@ -35,6 +35,7 @@ export const testFirstElement: TstatisticsElement = {
     activeTaskCounter: faker.datatype.number({ max: 10 }),
     timeoutCounter: faker.datatype.number({ max: 10 }),
   },
+  id: 1,
 };
 
 const testCreate = () => {
@@ -63,6 +64,7 @@ const testCreate = () => {
         activeTaskCounter: faker.datatype.number({ max: 10 }),
         timeoutCounter: faker.datatype.number({ max: 10 }),
       },
+      id: i + 2,
     });
   }
 
@@ -70,3 +72,25 @@ const testCreate = () => {
 };
 
 export const test = testCreate();
+
+export const emptyDay: TstatisticsElement = {
+  date: {
+    dayName: today.minus({ day: 1000 }).weekdayLong,
+    day: today.minus({ day: 1000 }).day,
+    month: today.minus({ day: 1000 }).month,
+    year: today.minus({ day: 1000 }).year,
+    weekNumber: today.minus({ day: 1000 }).weekNumber,
+    weekday: today.minus({ day: 1000 }).weekday,
+    locale: today.minus({ day: 1000 }).toLocaleString(),
+  },
+  value: {
+    timeToComplite: 0,
+    workingTime: 0,
+    pauseTime: 0,
+    pauseCounter: 0,
+    finishedPomadoro: 0,
+    activeTaskCounter: 1,
+    timeoutCounter: 1,
+  },
+  id: 0,
+};

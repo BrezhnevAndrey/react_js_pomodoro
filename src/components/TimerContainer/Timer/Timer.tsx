@@ -9,6 +9,7 @@ import {
   increasePauseTime,
   increaseTimeoutCounter,
   increaseWorkingTime,
+  TstatisticsElement,
 } from "../../../store/statisticsSlice";
 import {
   changeIsPaused,
@@ -29,10 +30,41 @@ import { Button } from "../../Button/Button";
 import { AddTimeButton } from "../../AddTimeButton/AddTimeButton";
 import styles from "./timer.less";
 import { TStatisticsState } from "../../../store/statisticsSlice";
+import useSound from "use-sound";
+import violin from "../../../sounds/violin.mp3";
+import { changeDBData } from "../../../store/indexedDB";
+import { IUserOptions } from "../../../store/userOptionsSlice";
 
 export function Timer() {
-  const timeoutTimeDefault = 4;
+  const shortTimeoutTime = useSelector<IUserOptions, number>(
+    (state) => state.userOptions.shortTimeoutDuration
+  );
+  const longTimeoutTime = useSelector<IUserOptions, number>(
+    (state) => state.userOptions.longTimeoutDuration
+  );
+  const intervalIndex = useSelector<IUserOptions, number>(
+    (state) => state.userOptions.longTimeoutFrequency
+  );
+
+  const IsSoundNotification = useSelector<IUserOptions, boolean>(
+    (state) => state.userOptions.IsSoundNotification
+  );
+
+  const [play] = useSound(violin);
+
   const dispatch = useDispatch();
+
+  const [IsUseDB, setIsUseDB] = useState(false);
+
+  const dataFromToday = useSelector<TStatisticsState, TstatisticsElement>(
+    (state) => state.statistics.dataset[state.statistics.dataset.length - 1]
+  );
+
+  const timeoutCounter = useSelector<TStatisticsState, number>(
+    (state) =>
+      state.statistics.dataset[state.statistics.dataset.length - 1].value
+        .timeoutCounter
+  );
 
   const activeTask = useSelector<TInitialState, TTaskState>((state) =>
     state.tasks.tasks[1] ? state.tasks.tasks[1] : state.tasks.tasks[0]
@@ -69,15 +101,19 @@ export function Timer() {
     if (!IsActiveTasks) return;
 
     if (activeTask.timeLeft === 0 && !IsTimeout) {
+      IsSoundNotification && play();
+      alert("Время устроить перерыв");
       dispatch(changeTasksReducer([1, -1])) &&
         dispatch(increaseFinishedPomadoro());
       dispatch(increasePomadoroCounter());
-      if (activeTask.amount > 0) {
-        setTimeoutTime(timeoutTimeDefault);
+      if (activeTask.amount > 1) {
         dispatch(changeIsTimeout(true));
         dispatch(increaseTimeoutCounter());
-      }
-
+      } else dispatch(changeIsPaused(true));
+      (timeoutCounter + 1) % intervalIndex === 0
+        ? setTimeoutTime(longTimeoutTime)
+        : setTimeoutTime(shortTimeoutTime);
+      setIsUseDB(true);
       return;
     }
     dispatch(changeActiveTaskTimeLeft(-1));
@@ -87,7 +123,11 @@ export function Timer() {
 
   const timeoutTick = () => {
     if (timeoutTime > 0) setTimeoutTime((prevState) => prevState - 1);
-    else dispatch(changeIsTimeout(false));
+    else {
+      IsSoundNotification && play();
+      dispatch(changeIsTimeout(false));
+      alert("Перерыв окончен");
+    }
   };
 
   const pauseTick = () => {
@@ -105,9 +145,6 @@ export function Timer() {
   };
 
   useEffect(() => {
-    // if(activeTask.amount === 0 && !IsTimeout) {
-    //   return ();
-    // }
     if (!IsActiveTasks) {
       dispatch(changeIsStarted(false));
       dispatch(changeIsTimeout(false));
@@ -118,7 +155,10 @@ export function Timer() {
       return () => clearInterval(timerId);
     }
     if (IsTimeout && !IsPaused) {
-      if (IsStarted) dispatch(changeIsStarted(false));
+      if (IsStarted) {
+        setIsUseDB(true);
+        dispatch(changeIsStarted(false));
+      }
       if (activeTask.amount === 0) {
         dispatch(deleteTasksReducer(1));
         dispatch(increaseActiveTaskCounter());
@@ -126,12 +166,17 @@ export function Timer() {
       const timerId = setInterval(() => timeoutTick(), 1000);
       return () => clearInterval(timerId);
     }
-    if (IsPaused) {
+    if ((IsPaused && activeTask.timeLeft > 0) || (IsPaused && IsTimeout)) {
       const timerId = setInterval(() => pauseTick(), 1000);
       return () => clearInterval(timerId);
     }
     if (activeTask.amount !== 0 && activeTask.timeLeft === 0)
       dispatch(resetActiveTaskTimeLeft());
+
+    if (IsUseDB) {
+      changeDBData(dataFromToday);
+      setIsUseDB(false);
+    }
   }, [seconds, minutes, IsPaused, IsStarted, IsTimeout]);
 
   return (
@@ -154,7 +199,7 @@ export function Timer() {
         </span>
       </div>
       <div className={styles.btnContainer}>
-        {activeTask.amount > 0 && !IsTimeout && !IsStarted && (
+        {!IsTimeout && !IsStarted && (
           <Button
             text={"Старт"}
             style={"green"}
@@ -169,18 +214,30 @@ export function Timer() {
             text={"Пауза"}
             style={"green"}
             click={() => {
-              dispatch(changeIsPaused(true));
-              dispatch(increasePauseCounter());
+              if (
+                (!IsTimeout && activeTask.timeLeft !== 0) ||
+                (IsTimeout && timeoutTime !== 0)
+              ) {
+                dispatch(changeIsPaused(true));
+                dispatch(increasePauseCounter());
+                setIsUseDB(true);
+              }
             }}
           />
         )}
-        {(activeTask.amount === 0 || IsPaused) && (
+        {IsPaused && (
           <Button
             text={"Продолжить"}
             style={"green"}
             click={() => {
+              if (activeTask.amount > 0 && activeTask.timeLeft === 0) {
+                dispatch(changeIsPaused(false));
+                dispatch(changeIsTimeout(true));
+                dispatch(increaseTimeoutCounter());
+              }
               (IsTimeout || activeTask.timeLeft !== 0) &&
                 dispatch(changeIsPaused(false));
+              setIsUseDB(true);
             }}
           />
         )}
@@ -191,33 +248,42 @@ export function Timer() {
             click={() => {
               dispatch(changeIsPaused(false));
               dispatch(changeIsTimeout(false));
-              setTimeoutTime(timeoutTimeDefault);
+              (timeoutCounter + 1) % intervalIndex === 0
+                ? setTimeoutTime(longTimeoutTime)
+                : setTimeoutTime(shortTimeoutTime);
+              setIsUseDB(true);
             }}
           />
         )}
-        {activeTask.amount > 0 &&
-          ((!IsStarted && !IsTimeout) ||
-            (IsStarted && !IsPaused && !IsTimeout)) && (
-            <Button
-              text={"Стоп"}
-              style={"red"}
-              disabled={IsStarted ? false : true}
-              click={() => {
-                dispatch(changeIsStarted(false));
-                dispatch(resetActiveTaskTimeLeft());
-              }}
-            />
-          )}
-        {(activeTask.amount === 0 || (IsStarted && IsPaused)) && (
+        {((!IsStarted && !IsTimeout) ||
+          (IsStarted && !IsPaused && !IsTimeout)) && (
+          <Button
+            text={"Стоп"}
+            style={"red"}
+            disabled={IsStarted ? false : true}
+            click={() => {
+              dispatch(changeIsStarted(false));
+              dispatch(resetActiveTaskTimeLeft());
+              setIsUseDB(true);
+            }}
+          />
+        )}
+        {IsStarted && IsPaused && (
           <Button
             text={"Сделано"}
             style={"red"}
             click={() => {
+              (timeoutCounter + 1) % intervalIndex === 0
+                ? setTimeoutTime(longTimeoutTime)
+                : setTimeoutTime(shortTimeoutTime);
+              dispatch(changeIsTimeout(true));
+              dispatch(increaseTimeoutCounter());
               dispatch(changeIsPaused(false));
               dispatch(changeIsStarted(false));
               dispatch(deleteTasksReducer(1));
               dispatch(increaseActiveTaskCounter());
               dispatch(changeTimeToComplete(activeTaskTime));
+              setIsUseDB(true);
             }}
           />
         )}

@@ -54,3 +54,22 @@
     background-color: @grey;
   }
 }
+
+@media screen and (max-width: @laptop) {
+  .button {
+    padding: 10px 25px 10px 10px;
+  }
+
+  .list {
+    > :first-child {
+      > button {
+        &::after {
+          width: 5px;
+          height: 5px;
+          right: 10%;
+          top: 40%;
+        }
+      }
+    }
+  }
+}

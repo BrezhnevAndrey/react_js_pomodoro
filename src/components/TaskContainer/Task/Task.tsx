@@ -6,7 +6,6 @@ import PlusImg from "../../../images/svg/plus.svg";
 import MinusImg from "../../../images/svg/minus.svg";
 import EditImg from "../../../images/svg/edit.svg";
 import BasketImg from "../../../images/svg/basket.svg";
-import { tasks } from "../TaskContainer";
 import { Modal } from "../../Modal/Modal";
 import { CSSTransition } from "react-transition-group";
 import ContentEditable from "react-contenteditable";
@@ -38,14 +37,6 @@ export function Task({ index, taskName }: ITask) {
 
   const listRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-
-  const deleteTask: (...args: any) => void = (
-    index: number,
-    tasks: Array<TTaskState>
-  ) => {
-    dispatch(deleteTasksReducer(index));
-    tasks.splice(index - 1, 1);
-  };
 
   const handleKeyUp = (event: any) => {
     if (event.code === "Enter") {
@@ -127,7 +118,7 @@ export function Task({ index, taskName }: ITask) {
             title={"Удалить задачу?"}
             click={() => {
               setIsOpenModal(false);
-              deleteTask(index, tasks);
+              dispatch(deleteTasksReducer(index));
               dispatch(changeIsStarted(false));
               dispatch(changeIsPaused(false));
             }}

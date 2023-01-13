@@ -1,13 +1,23 @@
 .container {
-  max-width: 1440px;
   margin: 0 auto;
   padding: 100px 80px;
   display: flex;
   justify-content: space-between;
+  gap: 20px;
   > :first-child {
     flex-basis: 45%;
   }
   > :last-child {
     flex-basis: 55%;
+  }
+}
+
+.blackTheme {
+  background-color: @greyDark;
+}
+
+@media screen and (max-width: @laptop) {
+  .container {
+    flex-direction: column-reverse;
   }
 }

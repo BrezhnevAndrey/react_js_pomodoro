@@ -1,9 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { DayNumbers, MonthNumbers, WeekdayNumbers, WeekNumbers } from "luxon";
 import { today } from "../utilits/today";
-import { test } from "../utilits/today";
+// import { test } from "../utilits/today";
 
-const data = test || [
+export const dataToday: Array<TstatisticsElement> = [
   {
     date: {
       dayName: today.weekdayLong,
@@ -23,12 +23,13 @@ const data = test || [
       activeTaskCounter: 1,
       timeoutCounter: 1,
     },
+    id: 0,
   },
 ];
 
 export type TStatisticsState = {
   statistics: {
-    activeIndex: number;
+    activeElement: TstatisticsElement;
     dataset: Array<TstatisticsElement>;
     activeTaskTime: number;
   };
@@ -55,14 +56,15 @@ export type TstatisticsElement = {
     activeTaskCounter: number;
     timeoutCounter: number;
   };
+  id: number;
 };
 
 const counterSlice = createSlice({
   name: "statistics",
   initialState: {
-    activeIndex: today.weekday - 1,
+    activeElement: dataToday[0],
     activeTaskTime: 0,
-    dataset: data,
+    dataset: dataToday,
   },
 
   reducers: {
@@ -70,19 +72,29 @@ const counterSlice = createSlice({
       state,
       action: PayloadAction<Array<TstatisticsElement>>
     ) {
-      action.payload.map((el) => {
-        state.dataset.push({
-          date: el.date,
-          value: {
-            timeToComplite: el.value.timeToComplite,
-            workingTime: el.value.workingTime,
-            pauseTime: el.value.pauseTime,
-            pauseCounter: el.value.pauseCounter,
-            finishedPomadoro: el.value.finishedPomadoro,
-            activeTaskCounter: el.value.activeTaskCounter,
-            timeoutCounter: el.value.timeoutCounter,
-          },
-        });
+      const arrayOfData = action.payload;
+      arrayOfData.sort((a, b) => {
+        if (a.date.weekNumber > b.date.weekNumber) return 1;
+        if (a.date.weekNumber < b.date.weekNumber) return -1;
+        else {
+          if (a.date.weekday > b.date.weekday) return 1;
+          if (a.date.weekday < b.date.weekday) return -1;
+          else return 0;
+        }
+      });
+      if (
+        arrayOfData[arrayOfData.length - 1].date.locale ===
+        today.toLocaleString()
+      ) {
+        state.dataset.splice(state.dataset.length - 1, 1);
+      }
+      arrayOfData.reverse().map((el) => {
+        if (Number(el.date.weekNumber) >= Number(today.weekNumber - 2))
+          state.dataset.unshift({
+            date: el.date,
+            value: el.value,
+            id: el.id,
+          });
       });
     },
     increaseWorkingTime(state) {
@@ -109,13 +121,16 @@ const counterSlice = createSlice({
     createStatisticsDate(state, action: PayloadAction<TDateState>) {
       state.dataset[0].date = action.payload;
     },
-    changeActiveIndex(state, action: PayloadAction<number>) {
-      state.activeIndex = action.payload;
+    changeActiveIndex(state, action: PayloadAction<TstatisticsElement>) {
+      state.activeElement = action.payload;
     },
     changeTimeToComplete(state, action: PayloadAction<number>) {
       state.dataset[state.dataset.length - 1].value.timeToComplite +=
         action.payload;
       state.activeTaskTime = 0;
+    },
+    changeElementsId(state, action: PayloadAction<number>) {
+      state.dataset[state.dataset.length - 1].id = action.payload;
     },
   },
 });
@@ -132,6 +147,7 @@ export const {
   changeActiveIndex,
   changeTimeToComplete,
   incraseActiveTaskTime,
+  changeElementsId,
 } = counterSlice.actions;
 
 export const statisticsReducers = counterSlice.reducer;

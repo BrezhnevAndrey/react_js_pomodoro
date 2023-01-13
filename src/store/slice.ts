@@ -16,26 +16,27 @@ export type TTaskState = {
   pomadoroCounter: number;
 };
 
+export const emptyTask: TTaskState = {
+  taskName: "Нет задач",
+  amount: 0,
+  timeLeft: 0,
+  pomadoroCounter: 1,
+};
+
 const counterSlice = createSlice({
   name: "task",
   initialState: {
     inputValue: "",
     defaultTime: 1500,
     statisticsWeekAgo: 0,
-    tasks: [
-      {
-        taskName: "Нет задач",
-        amount: 0,
-        timeLeft: 0,
-        pomadoroCounter: 1,
-      },
-    ],
+    tasks: [emptyTask],
   },
   reducers: {
     inputValue(state, action: PayloadAction<string>) {
       state.inputValue = action.payload;
     },
     pushTasksReducer(state, action: PayloadAction<Array<TTaskState>>) {
+      if (!action.payload) return;
       action.payload.map((el) => {
         state.tasks.push({
           taskName: el.taskName,

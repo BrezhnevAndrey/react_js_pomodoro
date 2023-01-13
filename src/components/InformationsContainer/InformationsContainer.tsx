@@ -11,20 +11,21 @@ import ImgStatisticTime from "../../images/svg/statistic-time.svg";
 import ImgStatisticPause from "../../images/svg/statistic-pause.svg";
 
 export function InformationsContainer() {
-  const activeIndex = useSelector<TStatisticsState, number>(
-    (state) => state.statistics.activeIndex
+  const activeElement = useSelector<TStatisticsState, TstatisticsElement>(
+    (state) => state.statistics.activeElement
   );
   const data = useSelector<TStatisticsState, Array<TstatisticsElement>>(
     (state) => state.statistics.dataset
   );
-  const activeDay = data[activeIndex];
+  const activeDay = activeElement;
+  const focusValue = Math.round(
+    activeDay.value.workingTime / activeDay.value.timeToComplite
+  );
   return (
     <div className={styles.container}>
       <InformationElement
         type={"Фокус"}
-        data={`${Math.round(
-          activeDay.value.workingTime / activeDay.value.timeToComplite
-        )}%`}
+        data={`${Number.isNaN(focusValue) ? 0 : focusValue}%`}
         image={<ImgStatisticFocus />}
       />
       <InformationElement

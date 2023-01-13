@@ -18,6 +18,7 @@ module.exports = {
   },
   devServer: {
     port: 3000,
+    historyApiFallback: true,
   },
   plugins: [
     new HtmlWebpackPlugin({ template: "./src/index.html" }),
@@ -63,7 +64,7 @@ module.exports = {
         ],
       },
       {
-        test: /\.(jpeg|png|jpg)$/,
+        test: /\.(jpeg|png|jpg|mp3)$/,
         use: {
           loader: "file-loader",
         },
@@ -76,7 +77,7 @@ module.exports = {
     ],
   },
   optimization: {
-    minimize: true,
+    minimize: IS_PROD ? true : false,
   },
   devtool: IS_PROD ? false : "eval-source-map",
 };

@@ -14,7 +14,7 @@ export function InformationElement({ type, data, image }: IInformationElement) {
         <h3 className={styles.subtitle}>{type}</h3>
         <div className={styles.value}>{data}</div>
       </div>
-      <div>{image}</div>
+      <div className={styles.image}>{image}</div>
     </div>
   );
 }
