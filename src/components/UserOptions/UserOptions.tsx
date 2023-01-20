@@ -1,7 +1,9 @@
 import classNames from "classnames";
-import React, { ChangeEvent, useRef } from "react";
+import React, { ChangeEvent, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { changeOptionsFromDB } from "../../store/indexedDB";
+import { increasePauseTime } from "../../store/statisticsSlice";
+import { TTimerState } from "../../store/timerSlice";
 import {
   changeIsBlackTheme,
   changeIsSoundNotification,
@@ -15,6 +17,9 @@ import styles from "./useroptions.less";
 
 export function UserOptions() {
   const dispatch = useDispatch();
+  const IsPaused = useSelector<TTimerState, boolean>(
+    (state) => state.timer.IsPaused
+  );
   const pomadoroDuration = useSelector<IUserOptions, number>(
     (state) => state.userOptions.pomadoroDuration
   );
@@ -103,12 +108,20 @@ export function UserOptions() {
     dispatch(changeIsBlackTheme(false));
   };
 
+  useEffect(() => {
+    if (!IsPaused) return;
+    const timerId = setInterval(() => {
+      dispatch(increasePauseTime());
+    }, 1000);
+    return () => clearInterval(timerId);
+  }, []);
+
   return (
     <form ref={ref} onSubmit={formClick} className={optionsClass}>
       <h3>
         Настройки применяются автоматически, чтобы сохранить настройки между
-        сессиями нажмите "Сохранить настройки".
-        Значения применяются только к новым задачам.
+        сессиями нажмите "Сохранить настройки". Значение длительности помидора
+        применятся к следующему помидору.
       </h3>
       <div className={styles.inputs}>
         <div>

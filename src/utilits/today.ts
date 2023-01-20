@@ -1,4 +1,4 @@
-import { DateTime } from "luxon";
+import { DateTime } from "ts-luxon";
 import { TstatisticsElement } from "../store/statisticsSlice";
 import { faker } from "@faker-js/faker";
 

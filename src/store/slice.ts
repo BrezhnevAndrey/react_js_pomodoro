@@ -4,6 +4,7 @@ export type TInitialState = {
   tasks: {
     inputValue: string;
     defaultTime: number;
+    timeoutTimeLeft: number;
     tasks: Array<TTaskState>;
     statisticsWeekAgo: 0 | 1 | 2;
   };
@@ -28,6 +29,7 @@ const counterSlice = createSlice({
   initialState: {
     inputValue: "",
     defaultTime: 1500,
+    timeoutTimeLeft: 0,
     statisticsWeekAgo: 0,
     tasks: [emptyTask],
   },
@@ -61,11 +63,20 @@ const counterSlice = createSlice({
     changeActiveTaskTimeLeft(state, action: PayloadAction<number>) {
       state.tasks[1] && (state.tasks[1].timeLeft += action.payload);
     },
-    resetActiveTaskTimeLeft(state) {
-      state.tasks[1] && (state.tasks[1].timeLeft = state.defaultTime);
+    resetActiveTaskTimeLeft(state, action: PayloadAction<number>) {
+      state.tasks[1] &&
+        (action
+          ? (state.tasks[1].timeLeft = action.payload)
+          : (state.tasks[1].timeLeft = state.defaultTime));
     },
     increasePomadoroCounter(state) {
       state.tasks[1] && (state.tasks[1].pomadoroCounter += 1);
+    },
+    increaseTimeoutTime(state) {
+      state.timeoutTimeLeft -= 1;
+    },
+    changeTimeoutTimeLeft(state, action: PayloadAction<number>) {
+      state.timeoutTimeLeft = action.payload;
     },
     changeStatisticsWeekAgo(state, action: PayloadAction<0 | 1 | 2>) {
       state.statisticsWeekAgo = action.payload;
@@ -80,8 +91,10 @@ export const {
   deleteTasksReducer,
   changeTasksReducer,
   changeActiveTaskTimeLeft,
-  increasePomadoroCounter,
   changeStatisticsWeekAgo,
+  changeTimeoutTimeLeft,
+  increasePomadoroCounter,
+  increaseTimeoutTime,
 } = counterSlice.actions;
 
 export const taskReducers = counterSlice.reducer;

@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { DayNumbers, MonthNumbers, WeekdayNumbers, WeekNumbers } from "luxon";
 import { today } from "../utilits/today";
 // import { test } from "../utilits/today";
 
@@ -36,12 +35,12 @@ export type TStatisticsState = {
 };
 
 export type TDateState = {
-  dayName: string;
-  day: DayNumbers;
-  month: MonthNumbers;
+  dayName: string | null;
+  day: number;
+  month: number;
   year: number;
-  weekNumber: WeekNumbers;
-  weekday: WeekdayNumbers;
+  weekNumber: number;
+  weekday: number;
   locale: string;
 };
 

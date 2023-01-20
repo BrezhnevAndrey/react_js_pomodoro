@@ -20,8 +20,10 @@ import {
 import {
   changeActiveTaskTimeLeft,
   changeTasksReducer,
+  changeTimeoutTimeLeft,
   deleteTasksReducer,
   increasePomadoroCounter,
+  increaseTimeoutTime,
   resetActiveTaskTimeLeft,
   TInitialState,
   TTaskState,
@@ -36,6 +38,9 @@ import { changeDBData } from "../../../store/indexedDB";
 import { IUserOptions } from "../../../store/userOptionsSlice";
 
 export function Timer() {
+  const pomadoroDuration = useSelector<IUserOptions, number>(
+    (state) => state.userOptions.pomadoroDuration
+  );
   const shortTimeoutTime = useSelector<IUserOptions, number>(
     (state) => state.userOptions.shortTimeoutDuration
   );
@@ -91,7 +96,9 @@ export function Timer() {
     (state) => state.statistics.activeTaskTime
   );
 
-  const [timeoutTime, setTimeoutTime] = useState(0);
+  const timeoutTime = useSelector<TInitialState, number>(
+    (state) => state.tasks.timeoutTimeLeft
+  );
   const seconds = IsTimeout ? timeoutTime % 60 : activeTask.timeLeft % 60;
   const minutes = IsTimeout
     ? Math.trunc(timeoutTime / 60)
@@ -102,7 +109,9 @@ export function Timer() {
 
     if (activeTask.timeLeft === 0 && !IsTimeout) {
       IsSoundNotification && play();
-      alert("Время устроить перерыв");
+      setTimeout(() => {
+        alert("Время устроить перерыв");
+      }, 1000);
       dispatch(changeTasksReducer([1, -1])) &&
         dispatch(increaseFinishedPomadoro());
       dispatch(increasePomadoroCounter());
@@ -111,9 +120,10 @@ export function Timer() {
         dispatch(increaseTimeoutCounter());
       } else dispatch(changeIsPaused(true));
       (timeoutCounter + 1) % intervalIndex === 0
-        ? setTimeoutTime(longTimeoutTime)
-        : setTimeoutTime(shortTimeoutTime);
+        ? dispatch(changeTimeoutTimeLeft(longTimeoutTime))
+        : dispatch(changeTimeoutTimeLeft(shortTimeoutTime));
       setIsUseDB(true);
+
       return;
     }
     dispatch(changeActiveTaskTimeLeft(-1));
@@ -122,11 +132,13 @@ export function Timer() {
   };
 
   const timeoutTick = () => {
-    if (timeoutTime > 0) setTimeoutTime((prevState) => prevState - 1);
+    if (timeoutTime > 0) dispatch(increaseTimeoutTime());
     else {
       IsSoundNotification && play();
       dispatch(changeIsTimeout(false));
-      alert("Перерыв окончен");
+      setTimeout(() => {
+        alert("Перерыв закончен");
+      }, 1000);
     }
   };
 
@@ -171,7 +183,7 @@ export function Timer() {
       return () => clearInterval(timerId);
     }
     if (activeTask.amount !== 0 && activeTask.timeLeft === 0)
-      dispatch(resetActiveTaskTimeLeft());
+      dispatch(resetActiveTaskTimeLeft(pomadoroDuration));
 
     if (IsUseDB) {
       changeDBData(dataFromToday);
@@ -249,8 +261,8 @@ export function Timer() {
               dispatch(changeIsPaused(false));
               dispatch(changeIsTimeout(false));
               (timeoutCounter + 1) % intervalIndex === 0
-                ? setTimeoutTime(longTimeoutTime)
-                : setTimeoutTime(shortTimeoutTime);
+                ? dispatch(changeTimeoutTimeLeft(longTimeoutTime))
+                : dispatch(changeTimeoutTimeLeft(shortTimeoutTime));
               setIsUseDB(true);
             }}
           />
@@ -263,7 +275,7 @@ export function Timer() {
             disabled={IsStarted ? false : true}
             click={() => {
               dispatch(changeIsStarted(false));
-              dispatch(resetActiveTaskTimeLeft());
+              dispatch(resetActiveTaskTimeLeft(pomadoroDuration));
               setIsUseDB(true);
             }}
           />
@@ -274,8 +286,9 @@ export function Timer() {
             style={"red"}
             click={() => {
               (timeoutCounter + 1) % intervalIndex === 0
-                ? setTimeoutTime(longTimeoutTime)
-                : setTimeoutTime(shortTimeoutTime);
+                ? dispatch(changeTimeoutTimeLeft(longTimeoutTime))
+                : dispatch(changeTimeoutTimeLeft(shortTimeoutTime));
+              console.log((timeoutCounter + 1) % intervalIndex === 0);
               dispatch(changeIsTimeout(true));
               dispatch(increaseTimeoutCounter());
               dispatch(changeIsPaused(false));
