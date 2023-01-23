@@ -288,7 +288,6 @@ export function Timer() {
               (timeoutCounter + 1) % intervalIndex === 0
                 ? dispatch(changeTimeoutTimeLeft(longTimeoutTime))
                 : dispatch(changeTimeoutTimeLeft(shortTimeoutTime));
-              console.log((timeoutCounter + 1) % intervalIndex === 0);
               dispatch(changeIsTimeout(true));
               dispatch(increaseTimeoutCounter());
               dispatch(changeIsPaused(false));
