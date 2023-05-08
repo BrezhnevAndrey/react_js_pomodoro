@@ -33,6 +33,7 @@ export function StatisticsContainer() {
   const deleteClick = async () => {
     dispatch(testDataset([emptyDay]))
     await deleteDB()
+    location.reload()
   }
 
   useEffect(() => {

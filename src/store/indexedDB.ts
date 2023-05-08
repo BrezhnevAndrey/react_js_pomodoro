@@ -88,6 +88,5 @@ export const changeOptionsFromDB = async (options: IUserOptions) => {
 };
 
 export const deleteDB = async () => {
-  console.log('deleteDB')
   indexedDB.deleteDatabase("pomadoro");
 };
