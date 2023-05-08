@@ -18,7 +18,7 @@ import {
   TStatisticsState,
 } from "../../store/statisticsSlice";
 import { TInitialState } from "../../store/slice";
-import { emptyDay, today } from "../../utilits/today";
+import { emptyDay, testFirstElement, today } from "../../utilits/today";
 
 ChartJS.register(
   CategoryScale,

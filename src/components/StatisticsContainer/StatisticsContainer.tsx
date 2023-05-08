@@ -2,7 +2,7 @@ import classNames from "classnames";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  increasePauseTime,
+  increasePauseTime, testDataset,
 } from "../../store/statisticsSlice";
 import { TTimerState } from "../../store/timerSlice";
 import { IUserOptions } from "../../store/userOptionsSlice";
@@ -10,6 +10,7 @@ import { InformationsContainer } from "../InformationsContainer/InformationsCont
 import { IntervalOptions } from "../IntervalOptions/IntervalOptions";
 import { ScheduleContainer } from "../ScheduleContainer";
 import styles from "./statisticscontainer.less";
+import {emptyDay, test} from "../../utilits/today";
 
 export function StatisticsContainer() {
   const dispatch = useDispatch();
@@ -23,6 +24,15 @@ export function StatisticsContainer() {
     [styles["blackTheme"]]: IsBlackTheme,
   });
 
+  const handleClick = () => {
+    dispatch(testDataset(test()))
+    console.log('testClick')
+  }
+
+  const deleteClick = () => {
+    dispatch(testDataset([emptyDay]))
+  }
+
   useEffect(() => {
     if (!IsPaused) return;
     const timerId = setInterval(() => {
@@ -35,6 +45,8 @@ export function StatisticsContainer() {
     <div className={statisticsClass}>
       <div className={styles.section}>
         <h3 className={styles.title}>Ваша активность</h3>
+        <button className={styles.testButton} onClick={handleClick}>Тест</button>
+        <button className={styles.testButton} onClick={deleteClick}>Обнулить</button>
         <div className={styles.options}>
           <IntervalOptions />
         </div>

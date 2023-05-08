@@ -71,7 +71,7 @@ const testCreate = () => {
   return array;
 };
 
-export const test = testCreate();
+export const test = testCreate;
 
 export const emptyDay: TstatisticsElement = {
   date: {

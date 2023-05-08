@@ -1,6 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { today } from "../utilits/today";
-// import { test } from "../utilits/today";
 
 export const dataToday: Array<TstatisticsElement> = [
   {
@@ -131,6 +130,10 @@ const counterSlice = createSlice({
     changeElementsId(state, action: PayloadAction<number>) {
       state.dataset[state.dataset.length - 1].id = action.payload;
     },
+    testDataset(state, action: PayloadAction<any>) {
+      console.log(action.payload);
+      state.dataset = action.payload
+    }
   },
 });
 
@@ -147,6 +150,7 @@ export const {
   changeTimeToComplete,
   incraseActiveTaskTime,
   changeElementsId,
+  testDataset,
 } = counterSlice.actions;
 
 export const statisticsReducers = counterSlice.reducer;
