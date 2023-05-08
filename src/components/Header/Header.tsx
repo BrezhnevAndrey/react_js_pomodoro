@@ -7,7 +7,7 @@ import { IUserOptions } from "../../store/userOptionsSlice";
 import classNames from "classnames";
 import { FrameButton } from "../FrameButton";
 import { StatisticsButton } from "../StatisticsButton/StatisticsButton";
-import { changeIsPaused } from "../../store/timerSlice";
+import { TTimerState, changeIsPaused } from "../../store/timerSlice";
 import {
   changeActiveIndex,
   TstatisticsElement,
@@ -26,6 +26,13 @@ export function Header() {
   const headerClass = classNames(styles["header"], {
     [styles["blackTheme"]]: IsBlackTheme,
   });
+  const IsSrarted = useSelector<TTimerState, boolean>(
+    (state) => state.timer.IsStarted
+  );
+  const IsPaused = useSelector<TTimerState, boolean>(
+    (state) => state.timer.IsPaused
+  );
+
   return (
     <div className={headerClass}>
       <FrameButton
@@ -37,7 +44,7 @@ export function Header() {
       />
       <FrameButton
         click={() => {
-          const answer = confirm("При этом действии включиться пауза");
+          const answer = (IsSrarted && !IsPaused) ? confirm("При этом действии включиться пауза") : true;
           answer && dispatch(changeIsPaused(true)) && navigate("/userOptions");
         }}
         text={"Опции"}
@@ -46,7 +53,7 @@ export function Header() {
       <StatisticsButton
         text={"Статистика"}
         click={() => {
-          const answer = confirm("При этом действии включиться пауза");
+          const answer = (IsSrarted && !IsPaused) ? confirm("При этом действии включиться пауза") : true;
           dispatch(changeActiveIndex(activeElement));
           answer && dispatch(changeIsPaused(true)) && navigate("/statistics");
         }}
