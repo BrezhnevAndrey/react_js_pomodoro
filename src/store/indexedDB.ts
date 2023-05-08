@@ -86,3 +86,8 @@ export const changeOptionsFromDB = async (options: IUserOptions) => {
   const store = tx.objectStore("options");
   await store.put({ id: 1, options: options });
 };
+
+export const deleteDB = async () => {
+  console.log('deleteDB')
+  indexedDB.deleteDatabase("pomadoro");
+};

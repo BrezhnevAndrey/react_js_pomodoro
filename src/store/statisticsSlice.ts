@@ -131,7 +131,6 @@ const counterSlice = createSlice({
       state.dataset[state.dataset.length - 1].id = action.payload;
     },
     testDataset(state, action: PayloadAction<any>) {
-      console.log(action.payload);
       state.dataset = action.payload
     }
   },

@@ -11,6 +11,7 @@ import { IntervalOptions } from "../IntervalOptions/IntervalOptions";
 import { ScheduleContainer } from "../ScheduleContainer";
 import styles from "./statisticscontainer.less";
 import {emptyDay, test} from "../../utilits/today";
+import { deleteDB } from '../../store/indexedDB';
 
 export function StatisticsContainer() {
   const dispatch = useDispatch();
@@ -29,8 +30,9 @@ export function StatisticsContainer() {
     console.log('testClick')
   }
 
-  const deleteClick = () => {
+  const deleteClick = async () => {
     dispatch(testDataset([emptyDay]))
+    await deleteDB()
   }
 
   useEffect(() => {
